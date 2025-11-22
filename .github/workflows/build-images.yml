@@ -1,25 +1,40 @@
+name: Build and Publish Images
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  build-runtime:
-    name: Build Runtime Image (Private)
+  build:
+    name: Build & Push Docker Images
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to GHCR
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push runtime image
-        uses: docker/build-push-action@v4
+      - name: Build and push image
+        uses: docker/build-push-action@v6
         with:
-          context: ./core
-          file: ./core/Dockerfile.runtime
+          context: .
+          file: Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/k3d-lakehouse-runtime:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/jupyter-base:latest
+            ghcr.io/${{ github.repository_owner }}/jupyter-base:${{ github.sha }}
