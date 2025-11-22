@@ -20,29 +20,21 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
-# tini como init
+# tini como init (evita zombies y gestiona señales correctamente)
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
 # -----------------------------------------------
-# 2. Copiar runtime privado (tu producto)
+# 2. Espacio privado del runtime (vacío por ahora)
 # -----------------------------------------------
 WORKDIR /app
 
-# Tú decides qué va dentro:
-# - manifests generados
-# - jinja templates
-# - scripts de control
-# - contenedores sidecar
-# - assets internos
-COPY runtime/ /app/runtime/
-COPY scripts/ /app/scripts/
-
-# (Opcional) instalar algo específico de tu plataforma
-# RUN pip install -r /app/runtime/requirements.txt
+# TODO (futuro):
+# COPY runtime/ /app/runtime/
+# COPY scripts/ /app/scripts/
+# RUN chmod -R 755 /app
 
 # -----------------------------------------------
-# 3. Permisos
+# 3. Comando seguro (por ahora sin runtime real)
 # -----------------------------------------------
-RUN chmod -R 755 /app
-
-CMD ["bash", "/app/scripts/start.sh"]
+# Como aún no existen scripts ni start.sh, dejamos bash como fallback.
+CMD ["bash"]
